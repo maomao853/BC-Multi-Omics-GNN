@@ -9,10 +9,6 @@ We proposed the utilization of a graph neural network (GNN) to identify clusters
 ![Overall project workflow](https://github.com/maomao853/BC-Multi-Omics-GNN/assets/70410309/3962b0fe-9609-4951-9aec-80f731708c71)
 
 ## Graph Neural Network
-
-### Architecture
-![GNN architecture](architecture.png)
-
 ### Data
 The GNN is trained on protein data and multi-omics data from various sources.
 * Protein amino acid sequence from [UniProt database](https://doi.org/10.1093/nar/gkaa1100).
@@ -23,19 +19,51 @@ The data combined with gene-level meta-survival effects and multi-omics data fro
 
 An Evolutionary Scale Modeling (ESM)-1b Transformer from [Rives et al.](https://doi.org/10.1073/pnas.2016239118) was used to extract features from the protein dataset.
 
-### Training and Testing
-To train and test the GNN model, make sure the dependencies are satisfied, then run
+### Training
+To train the GNN model, make sure all dependencies are satisfied and place any required data sets in the `/data` directory, then run
 ```
-bash HGNN_main.sh
+bash HGNN_train.sh
 ```
 
-Dependencies
-* [HiLander Model](https://github.com/dmlc/dgl/tree/master/examples/pytorch/hilander)
-* [R](https://www.r-project.org/)
+This will train the GNN on the aforementioned data with the following parameters:
 
-###
+- `model_filename`: path to the saved model file (checkpoint/deepglint_sampler.pth)
+- `knn_k`: number of neighbours (5)
+- `levels`: # of levels in hierarchical map (5)
+- `hidden`: # of hidden layers (128)
+- `epochs`: 200
+- `lr`: learning rate (0.01)
+- `batch_size`: 64
+- `num_conv`: # of convolutions (3)
+- `balance`: true
+- `use_cluster_feat`: true
+
+The model will be output in the file indicated using `--model_filename` in the bash script. Additionally, the hierarchical map will be output in `hier.csv` in the root directory.
+
+### Testing
+To test the GNN model, place any required data sets in the `/data` directory, then run
+```
+bash HGNN_test.sh
+```
+
+This will test the selected GNN model on the aforementioned data with the following parameters:
+
+- `model_filename`: path to the saved model file (checkpoint/deepglint_sampler.pth)
+- `knn_k`: number of neighbours (5)
+- `tau`: 0.8
+- `level`: # of levels in hierarchical map (5)
+- `threshold`: prob
+- `faiss_gpu`: true
+- `hidden`: # of hidden layers (128)
+- `num_conv`: # of convolutions (3)
+- `batch_size`: 64
+- `early_stop`: true
+- `use_cluster_feat`: true
 
 ## Clinical Hotspots Identification
+
+### Preparation
+Clone the HiSig repository from [Zheng et al.](https://doi.org/10.1126/science.abf3067) into the root directory and install [R](https://www.r-project.org/). Any required data sets should be placed in the `/data` directory.
 
 ### Mutation/Survival
 To identify clinical hotspots based on mutation and survival pressures using the [cBioPortal OncoPrint](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4160307/) database, run the following code.
@@ -50,4 +78,12 @@ sh group_lasso_DepMap_cMap.sh
 ```
 
 ## Hierarchical Map Construction
-WIP
+A hierarchical map is constructed using [Cytoscape](https://doi.org/10.1186/s13059-019-1758-4). Use the IPython Notebooks in `/annotation` to prepare the data for creation of a Cytoscape network.
+
+The `prepare_network.ipynb` file will produce a .csv input file for Cytoscape. Import a network with the following settings:
+- `parent`: source node, number
+- `child`: target node, number
+- `genes`: target node attribute, list of strings
+- `num_nodes`: target node attribute, number
+
+The significant nodes identified using group lasso may be processed using `prepare_hotspot.ipynb`. The resulting .csv file may be used as an additional target node attribute in the existing network.
