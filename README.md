@@ -66,7 +66,7 @@ This will test the selected GNN model on the aforementioned data with the follow
 Clone the HiSig repository from [Zheng et al.](https://doi.org/10.1126/science.abf3067) into the root directory and install [R](https://www.r-project.org/). Any required data sets should be placed in the `/data` directory.
 
 ### Mutation/Survival
-To identify clinical hotspots based on mutation and survival pressures using the [cBioPortal OncoPrint](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4160307/) database, run the following code.
+To identify clinical hotspots based on mutation data from [Zheng et al.](https://doi.org/10.1126/science.abf3067) and survival data from [Smith and Sheltzer](https://doi.org/10.1016%2Fj.celrep.2022.110569), run the following code.
 ```
 bash group_lasso_mutation_survival.sh
 ```
@@ -86,4 +86,7 @@ The `prepare_network.ipynb` file will produce a .csv input file for Cytoscape. I
 - `genes`: target node attribute, list of strings
 - `num_nodes`: target node attribute, number
 
-The significant nodes identified using group lasso may be processed using `prepare_hotspot.ipynb`. The resulting .csv file may be used as an additional target node attribute in the existing network.
+The significant nodes identified using group lasso may be processed using `prepare_hotspot.ipynb`. The resulting .csv file may be used as an additional target node attribute in the existing network. Then, pruning is conducted manually using a bottom-up breadth first search (BFS) method of traversal, where any insignificant non-leaf nodes were removed from the tree (insignificant nodes are defined as any node that is not a clinical hotspot).
+
+### Annotations
+Enrichment analysis is performed using [Enrichr](https://maayanlab.cloud/Enrichr/) and the [KEGG 2021 Human](https://www.kegg.jp/) gene-set library to identify functions of protein communities. Enriched terms are grouped based on biological function and the resulting groups (protein systems) are named using biological knowledge and literature analysis.
