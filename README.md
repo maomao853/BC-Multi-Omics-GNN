@@ -1,4 +1,4 @@
-# A novel graph neural network algorithm for interpreting breast cancer mutation and prognostic risk using hierarchical map of protein communities
+# A Graph Neural Network Approach for Hierarchical Mapping of Breast Cancer Protein Communities
 
 ## Introduction
 This repository provides the source code and raw datasets associated with the paper A novel graph neural network algorithm for interpreting breast cancer mutation and prognostic risk using hierarchical map of protein communities.
